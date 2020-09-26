@@ -252,7 +252,7 @@ public class CritterFunctionalTest {
     private static EmployeeDTO createEmployeeDTO() {
         EmployeeDTO employeeDTO = new EmployeeDTO();
         employeeDTO.setName("TestEmployee");
-        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.FRIDAY, DayOfWeek.MONDAY));
+//        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.FRIDAY, DayOfWeek.MONDAY));
         employeeDTO.setSkills(Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.PETTING));
         return employeeDTO;
     }

@@ -31,9 +31,36 @@ public class PetController {
         pet.setNotes(petDTO.getNotes());
         pet.setType(petDTO.getType());
         pet.setCustomer(customerService.getCustomerById(petDTO.getOwnerId()));
+        pet = petService.savePet(pet);
 
-        //2. get the entity from the database, then turn the pet into PetDTO
+        //2. update pets in customer !! we have to add the new pet into the customer
+        Customer customer = customerService.getCustomerById(pet.getCustomer().getId());
+        customer.getPets().add(pet);
+        customer = customerService.saveCustomer(customer);
         return turnToPetDTO(petService.savePet(pet));
+
+
+
+        //先設定好pet裡面應該要有的內容 然後透過findCustomerById找到customer存進去pet裡面
+        //可是!!!這時候的customer還沒有將最新的pet存進去!!
+//        Pet pet = new Pet();
+//        Customer customer = customerService.getCustomerById(petDTO.getOwnerId());
+//        pet.setName(petDTO.getName());
+//        pet.setBirthDate(petDTO.getBirthDate());
+//        pet.setNotes(petDTO.getNotes());
+//        pet.setType(petDTO.getType());
+//        pet.setCustomer(customer);
+//
+//        //設定好pet之後存進去重新取得pet
+//        Pet newPet = petService.savePet(pet);
+//
+//        //如果發現customer裡面沒有pets
+//        if(customer.getPets() == null){
+//            customer.setPets(new ArrayList<>());
+//        }
+//        //新增一個pet 把最新的pet設定進去
+//        customer.getPets().add(newPet);
+//        return turnToPetDTO(pet);
 
     }
 

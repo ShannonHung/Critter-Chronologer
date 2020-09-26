@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Handles web requests related to Users.
@@ -53,25 +55,14 @@ public class UserController {
         List<CustomerDTO> customerDTOS = new ArrayList<>();
         List<Customer> customers = customerService.getAllCustomers();
 
-        //但是customerDTO裡面還有petIDs所以我們要去尋找pet裡面是否有ownerid為customer.id的值然後放進去DTO
-        for(Customer customer:customers){
-            //get customerid
-            Long customerId = customer.getId();
-            //get pets which ownerid is equal to customerid
-            List<Pet> pets = petService.getPetsByOwner(customerId);
-//            System.out.println("pets.get(0).getId()" + pets.get(0).getId());
-
-            //turn customer into customerDTO
-            CustomerDTO customerDTO = turnToCustomerDTO(customer);
-            //setPetIDs in customerDTO
-            customerDTO.setPetIds(turnToPetIds(pets));
-//            System.out.println("customerDTO.getPetIds().size() = " + customerDTO.getPetIds().size());
-            //add customerDTO into the list
-            customerDTOS.add(customerDTO);
+        for(Customer customer : customers){
+            customerDTOS.add(turnToCustomerDTO(customer));
         }
-        //return the list
-//        System.out.println("customerDTOS.get(0).getPetIds()" + customerDTOS.get(0).getPetIds());
+
         return customerDTOS;
+
+        //高階寫法
+//        return customers.stream().map(this::turnToCustomerDTO).collect(Collectors.toList());
     }
     public List<Long> turnToPetIds(List<Pet> pets){
         List<Long> petids = new ArrayList<>();
@@ -114,12 +105,25 @@ public class UserController {
 
     @PutMapping("/employee/{employeeId}")
     public void setAvailability(@RequestBody Set<DayOfWeek> daysAvailable, @PathVariable long employeeId) {
-        throw new UnsupportedOperationException();
+        //1. now we get daysAvailable and employeeId, find the employeeById first
+        Employee employee = employeeService.getEmployeeById(employeeId);
+
+        //2. set the daysAvailable to employee
+        employee.setDaysAvailable(daysAvailable);
+
+        //3. save the newEmployee to the database
+        Employee newEmployee = employeeService.saveEmployee(employee);
+
     }
 
     @GetMapping("/employee/availability")
     public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeDTO) {
-        throw new UnsupportedOperationException();
+        List<Employee> employees = employeeService.getEmployeesBySkillAndDay(
+                employeeDTO.getSkills(), employeeDTO.getDate().getDayOfWeek());
+
+        return employees.stream().map(this::turnToEmployeeDTO).collect(Collectors.toList());
+
+
     }
 
     //this method will get the object from the database, and we need to turn it into CustomerDTO
@@ -136,7 +140,7 @@ public class UserController {
             System.out.println("pet.getId()" + pet.getId());
             petids.add(pet.getId());
         }
-        System.out.println("petids.get(0)" + petids.get(0));
+//        System.out.println("petids.get(0)" + petids.get(0));
         customerDTO.setPetIds(petids);
         return customerDTO;
     }

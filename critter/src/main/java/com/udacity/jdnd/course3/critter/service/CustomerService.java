@@ -26,6 +26,9 @@ public class CustomerService {
         System.out.println(customer1.getId());
         return customer1;
     }
+    public Customer saveCustomer(Customer customer){
+        return customerRepository.save(customer);
+    }
     public List<Customer> getAllCustomers(){
         return customerRepository.findAll();
     }
