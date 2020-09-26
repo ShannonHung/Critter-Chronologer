@@ -3,6 +3,7 @@ package com.udacity.jdnd.course3.critter.user;
 import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.util.Set;
 
@@ -10,18 +11,10 @@ import java.util.Set;
  * Represents the form that employee request and response data takes. Does not map
  * to the database directly.
  */
-@Entity
-public class EmployeeDTO {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class EmployeeDTO implements Serializable {
     private long id;
-
-    @Nationalized
     private String name;
-
-    
     private Set<EmployeeSkill> skills;
-
     private Set<DayOfWeek> daysAvailable;
 
     public long getId() {

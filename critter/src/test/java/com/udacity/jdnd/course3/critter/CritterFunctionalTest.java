@@ -44,11 +44,19 @@ public class CritterFunctionalTest {
 
     @Test
     public void testCreateCustomer(){
+        //丟一個CustomerDTO進來: name and phonenumber 這是自己打的
         CustomerDTO customerDTO = createCustomerDTO();
+        //這是存進去資料庫之後，回傳的entity然後已經轉成DTO了
         CustomerDTO newCustomer = userController.saveCustomer(customerDTO);
+        //這是從資料庫取得所有的customer選第一筆
         CustomerDTO retrievedCustomer = userController.getAllCustomers().get(0);
+
+        /*檢查*/
+        //從資料庫回傳的custome.getName == 自己設定的名稱
         Assertions.assertEquals(newCustomer.getName(), customerDTO.getName());
+        //從資料庫回傳的custome.getName == 從資料庫丟回來的id
         Assertions.assertEquals(newCustomer.getId(), retrievedCustomer.getId());
+        //如果有存進去正常來說getAllCustomers回傳的第一個id = 1
         Assertions.assertTrue(retrievedCustomer.getId() > 0);
     }
 
@@ -244,6 +252,7 @@ public class CritterFunctionalTest {
     private static EmployeeDTO createEmployeeDTO() {
         EmployeeDTO employeeDTO = new EmployeeDTO();
         employeeDTO.setName("TestEmployee");
+        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.FRIDAY, DayOfWeek.MONDAY));
         employeeDTO.setSkills(Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.PETTING));
         return employeeDTO;
     }
