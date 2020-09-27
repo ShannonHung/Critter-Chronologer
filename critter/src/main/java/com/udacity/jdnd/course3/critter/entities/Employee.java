@@ -7,7 +7,7 @@ import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
 import java.time.DayOfWeek;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -41,6 +41,9 @@ public class Employee {
     @Column
     @Enumerated(EnumType.STRING)
     private Set<DayOfWeek> daysAvailable;
+
+    @ManyToMany(mappedBy = "employees")
+    List<Schedule> schedules;
 
     public Employee(){}
 
@@ -88,5 +91,13 @@ public class Employee {
 
     public void setDaysAvailable(Set<DayOfWeek> daysAvailable) {
         this.daysAvailable = daysAvailable;
+    }
+
+    public List<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 }

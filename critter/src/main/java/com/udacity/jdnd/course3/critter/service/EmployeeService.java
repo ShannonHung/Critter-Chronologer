@@ -23,10 +23,14 @@ public class EmployeeService{
         return employeeRepository.getOne(id);
     }
     public List<Employee> getEmployeesBySkillAndDay(Set<EmployeeSkill> skills, DayOfWeek dayOfWeek){
-        List<Employee> employees = employeeRepository.findAllBySkillsInAndDaysAvailableContains(skills, dayOfWeek);
+//        List<Employee> employees = employeeRepository.findAllBySkillsInAndDaysAvailableContains(skills, dayOfWeek);
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
+        dayOfWeeks.add(dayOfWeek);
+        List<Employee> employees = employeeRepository.findAll();
+
         List<Employee> employeeList = new ArrayList<>();
         employees.forEach(thisEmployee ->{
-            if(thisEmployee.getSkills().containsAll(skills)){
+            if(thisEmployee.getSkills().containsAll(skills) && thisEmployee.getDaysAvailable().containsAll(dayOfWeeks)){
                 employeeList.add(thisEmployee);
             }
         });

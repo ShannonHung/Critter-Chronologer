@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Handles web requests related to Pets.
@@ -21,58 +22,48 @@ public class PetController {
     @Autowired
     CustomerService customerService;
 
-    @PostMapping
+    @PostMapping("/{petId}")
     public PetDTO savePet(@RequestBody PetDTO petDTO) {
-        /*1. we get petDTO from the POSTMAN, then save this object into the database
-            - the object we get from the postman included customerid, name and type*/
+        //先設定好pet裡面應該要有的內容 然後透過findCustomerById找到customer存進去pet裡面
+        //可是!!!這時候的customer還沒有將最新的pet存進去!!
         Pet pet = new Pet();
+        Customer customer = new Customer();
+        //因為petDTO如果沒有放任何東西 owenerID會是0 可是沒有customerID = 0才會噴錯
+        if(petDTO.getOwnerId()==0) {
+            //如果是0 代表沒有，所以我們要放null
+            pet.setCustomer(null);
+        }else{
+            customer = customerService.getCustomerById(petDTO.getOwnerId());
+            pet.setCustomer(customer);
+        }
         pet.setName(petDTO.getName());
         pet.setBirthDate(petDTO.getBirthDate());
         pet.setNotes(petDTO.getNotes());
         pet.setType(petDTO.getType());
-        pet.setCustomer(customerService.getCustomerById(petDTO.getOwnerId()));
-        pet = petService.savePet(pet);
 
-        //2. update pets in customer !! we have to add the new pet into the customer
-        Customer customer = customerService.getCustomerById(pet.getCustomer().getId());
-        customer.getPets().add(pet);
-        customer = customerService.saveCustomer(customer);
-        return turnToPetDTO(petService.savePet(pet));
+        //設定好pet之後存進去重新取得pet
+        Pet newPet = petService.savePet(pet);
 
-
-
-        //先設定好pet裡面應該要有的內容 然後透過findCustomerById找到customer存進去pet裡面
-        //可是!!!這時候的customer還沒有將最新的pet存進去!!
-//        Pet pet = new Pet();
-//        Customer customer = customerService.getCustomerById(petDTO.getOwnerId());
-//        pet.setName(petDTO.getName());
-//        pet.setBirthDate(petDTO.getBirthDate());
-//        pet.setNotes(petDTO.getNotes());
-//        pet.setType(petDTO.getType());
-//        pet.setCustomer(customer);
-//
-//        //設定好pet之後存進去重新取得pet
-//        Pet newPet = petService.savePet(pet);
-//
-//        //如果發現customer裡面沒有pets
-//        if(customer.getPets() == null){
-//            customer.setPets(new ArrayList<>());
-//        }
-//        //新增一個pet 把最新的pet設定進去
-//        customer.getPets().add(newPet);
-//        return turnToPetDTO(pet);
+        //如果發現customer裡面沒有pets
+        if(customer.getPets() == null){
+            customer.setPets(new ArrayList<>());
+        }
+        //新增一個pet 把最新的pet設定進去
+        customer.getPets().add(newPet);
+        return turnToPetDTO(pet);
 
     }
 
     @GetMapping("/{petId}")
     public PetDTO getPet(@PathVariable long petId) {
+        System.out.println("petId" + petId);
         return turnToPetDTO(petService.getPetById(petId));
     }
 
     @GetMapping
     public List<PetDTO> getPets(){
-
-        throw new UnsupportedOperationException();
+        List<Pet> pets = petService.getAllPets();
+        return pets.stream().map(this::turnToPetDTO).collect(Collectors.toList());
     }
 
     @GetMapping("/owner/{ownerId}")
@@ -91,7 +82,12 @@ public class PetController {
         petDTO.setBirthDate(pet.getBirthDate());
         petDTO.setName(pet.getName());
         petDTO.setNotes(pet.getNotes());
-        petDTO.setOwnerId(pet.getCustomer().getId());
+
+        if(pet.getCustomer() == null){
+            petDTO.setOwnerId(0);
+        }else{
+            petDTO.setOwnerId(pet.getCustomer().getId());
+        }
         petDTO.setType(pet.getType());
         return petDTO;
     }

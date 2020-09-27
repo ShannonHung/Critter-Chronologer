@@ -7,9 +7,10 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.*;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+//@Inheritance(strategy = InheritanceType.JOINED)
 public class Pet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,9 +24,7 @@ public class Pet {
     @Column(length = 65)
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="customer_id")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @ManyToOne(optional = true,cascade = CascadeType.ALL)
     private Customer customer;
 
     @Type(type = "LocalDate")
@@ -33,6 +32,11 @@ public class Pet {
 
     @Column(length = 500)
     private String notes;
+
+    @ManyToMany(mappedBy = "pets")
+    private List<Schedule> schedules;
+
+    public Pet(){}
 
     public long getId() {
         return id;
@@ -80,5 +84,13 @@ public class Pet {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public List<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 }

@@ -192,7 +192,7 @@ public class CritterFunctionalTest {
         List<Long> employeeList = Lists.newArrayList(employeeDTO.getId());
         Set<EmployeeSkill> skillSet =  Sets.newHashSet(EmployeeSkill.PETTING);
 
-        scheduleController.createSchedule(createScheduleDTO(petList, employeeList, date, skillSet));
+        ScheduleDTO newscheduleDTO = scheduleController.createSchedule(createScheduleDTO(petList, employeeList, date, skillSet));
         ScheduleDTO scheduleDTO = scheduleController.getAllSchedules().get(0);
 
         Assertions.assertEquals(scheduleDTO.getActivities(), skillSet);
@@ -212,8 +212,8 @@ public class CritterFunctionalTest {
         sched3.setPetIds(sched2.getPetIds());
         sched3.setActivities(Sets.newHashSet(EmployeeSkill.SHAVING, EmployeeSkill.PETTING));
         sched3.setDate(LocalDate.of(2020, 3, 23));
-        scheduleController.createSchedule(sched3);
-
+        sched3 = scheduleController.createSchedule(sched3);
+        System.out.println("stop");
         /*
             We now have 3 schedule entries. The third schedule entry has the same employees as the 1st schedule
             and the same pets/owners as the second schedule. So if we look up schedule entries for the employee from
@@ -262,7 +262,6 @@ public class CritterFunctionalTest {
         customerDTO.setPhoneNumber("123-456-789");
         return customerDTO;
     }
-
     private static PetDTO createPetDTO() {
         PetDTO petDTO = new PetDTO();
         petDTO.setName("TestPet");

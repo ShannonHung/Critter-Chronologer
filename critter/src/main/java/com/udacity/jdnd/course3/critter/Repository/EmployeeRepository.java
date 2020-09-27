@@ -11,9 +11,7 @@ import java.util.*;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-//    @Query("SELECT e from employee e where e.skills = :skills and e.daysAvailable = :dayofweeks")
-//    List<Employee> findEmployeeBySkillsAndDay(Set<EmployeeSkill> skills, Set<DayOfWeek> dayofweeks);
-
     List<Employee> findAllBySkillsInAndDaysAvailableContains(Set<EmployeeSkill> skills, DayOfWeek dayOfWeek);
+
 
 }

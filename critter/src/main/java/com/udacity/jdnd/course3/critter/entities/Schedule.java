@@ -28,6 +28,12 @@ public class Schedule {
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Pet> pets;
 
+    @ManyToMany
+    @JoinTable(name="schedule_customer", joinColumns = @JoinColumn(name = "schedule_id"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id"))
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private List<Customer> customers;
+
     private LocalDate date;
 
     //因為他不是獨立的entity所以使用elementCollection就可
@@ -78,5 +84,13 @@ public class Schedule {
 
     public void setActivities(Set<EmployeeSkill> activities) {
         this.activities = activities;
+    }
+
+    public List<Customer> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
     }
 }

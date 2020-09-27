@@ -100,7 +100,8 @@ public class UserController {
 
     @PostMapping("/employee/{employeeId}")
     public EmployeeDTO getEmployee(@PathVariable long employeeId) {
-        return turnToEmployeeDTO(employeeService.getEmployeeById(employeeId));
+        Employee employee = employeeService.getEmployeeById(employeeId);
+        return turnToEmployeeDTO(employee);
     }
 
     @PutMapping("/employee/{employeeId}")
@@ -113,16 +114,25 @@ public class UserController {
 
         //3. save the newEmployee to the database
         Employee newEmployee = employeeService.saveEmployee(employee);
-
+        System.out.println("http://localhost:8082/user/employee/1 = " + newEmployee.getName() + newEmployee.getSchedules());
     }
 
     @GetMapping("/employee/availability")
     public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeDTO) {
         List<Employee> employees = employeeService.getEmployeesBySkillAndDay(
                 employeeDTO.getSkills(), employeeDTO.getDate().getDayOfWeek());
+        List<EmployeeDTO> employeeDTOS = new ArrayList<>();
+
+        //stream()就是在做這件事
+//        for(Employee employee : employees){
+//            // .collect(Collectors.toList()) 就是在做 employeeDTOs.add
+//            // this::turnToEmployeeDTO = 這裡的this是stream map出來的東西也就是employee, 然後::旁邊的是將this放入某個方法
+//            employeeDTOS.add(turnToEmployeeDTO(employee));
+//        }
+//        return employeeDTOS;
+
 
         return employees.stream().map(this::turnToEmployeeDTO).collect(Collectors.toList());
-
 
     }
 

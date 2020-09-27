@@ -14,7 +14,9 @@ public class PetService {
     public Pet savePet(Pet pet){
         return petRepository.save(pet);
     }
-
+    public List<Pet> getAllPets(){
+        return petRepository.findAll();
+    }
     public Pet getPetById(Long id){
         return petRepository.getOne(id);
     }
