@@ -121,8 +121,8 @@ public class UserController {
     public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeDTO) {
         List<Employee> employees = employeeService.getEmployeesBySkillAndDay(
                 employeeDTO.getSkills(), employeeDTO.getDate().getDayOfWeek());
-        List<EmployeeDTO> employeeDTOS = new ArrayList<>();
 
+//        List<EmployeeDTO> employeeDTOS = new ArrayList<>();
         //stream()就是在做這件事
 //        for(Employee employee : employees){
 //            // .collect(Collectors.toList()) 就是在做 employeeDTOs.add

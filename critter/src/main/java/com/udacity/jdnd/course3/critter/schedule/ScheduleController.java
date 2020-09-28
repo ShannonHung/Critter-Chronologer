@@ -2,6 +2,7 @@ package com.udacity.jdnd.course3.critter.schedule;
 
 import com.udacity.jdnd.course3.critter.Repository.EmployeeRepository;
 import com.udacity.jdnd.course3.critter.Repository.PetRepository;
+import com.udacity.jdnd.course3.critter.entities.Customer;
 import com.udacity.jdnd.course3.critter.entities.Employee;
 import com.udacity.jdnd.course3.critter.entities.Pet;
 import com.udacity.jdnd.course3.critter.entities.Schedule;
@@ -11,6 +12,7 @@ import com.udacity.jdnd.course3.critter.service.PetService;
 import com.udacity.jdnd.course3.critter.service.ScheduleService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -34,10 +36,49 @@ public class ScheduleController {
 
     @PostMapping
     public ScheduleDTO createSchedule(@RequestBody ScheduleDTO scheduleDTO) {
-        System.out.println("scheduleDTO.getPetIds().size()" + scheduleDTO.getPetIds().size());
-        Schedule schedule = scheduleService.saveSchedule(scheduleDTO);
-        System.out.println("Now siz is = " + schedule.getPets().size());
-        return turnToScheduleDTO(schedule);
+        System.out.println("test = " +scheduleDTO.getPetIds().get(0));
+        System.out.println("test2 = " + scheduleDTO.getEmployeeIds().get(0) + scheduleDTO.getActivities().toString() + scheduleDTO.getDate());
+
+        Schedule schedule = new Schedule();
+        BeanUtils.copyProperties(scheduleDTO, schedule);
+
+        List<Employee> employees = findEmployeesById(scheduleDTO.getEmployeeIds());
+        schedule.setEmployees(employees);
+
+        List<Pet> pets = findPetsById(scheduleDTO.getPetIds());
+        schedule.setPets(pets);
+
+
+        for(Pet pet:pets){
+            Customer customers = customerService.getCustomerById(pet.getCustomer().getId());
+            if(schedule.getCustomers()==null) schedule.setCustomers(new ArrayList<>());
+            schedule.getCustomers().add(customers);
+        }
+
+        Schedule newSchedule = scheduleService.saveSchedule(schedule);
+
+        //update employees
+        for(Employee employee : employees){
+            if(employee.getSchedules() == null) employee.setSchedules(new ArrayList<>());
+            employee.getSchedules().add(schedule);
+            employeeService.saveEmployee(employee);
+        }
+
+        //update pets
+        for(Pet pet : pets){
+            if(pet.getSchedules() == null) pet.setSchedules(new ArrayList<>());
+            pet.getSchedules().add(schedule);
+            petService.savePet(pet);
+        }
+
+        //update customers
+        for(Customer customer: schedule.getCustomers()){
+            if(customer.getSchedules() == null) customer.setSchedules(new ArrayList<>());
+            customer.getSchedules().add(schedule);
+            customerService.saveCustomer(customer);
+        }
+
+        return turnToScheduleDTO(newSchedule);
     }
 
     @GetMapping
@@ -65,6 +106,7 @@ public class ScheduleController {
     @GetMapping("/customer/{customerId}")
     public List<ScheduleDTO> getScheduleForCustomer(@PathVariable long customerId) {
         List<Schedule> schedules = customerService.getCustomerById(customerId).getSchedules();
+        System.out.println("getScheduleForCustomer = " + schedules.size());
         return schedules.stream().map(this::turnToScheduleDTO).collect(Collectors.toList());
     }
 
@@ -88,5 +130,21 @@ public class ScheduleController {
             petsId.add(pet.getId());
         }
         return petsId;
+    }
+    public List<Employee> findEmployeesById(List<Long> employeesId){
+        List<Employee> employees = new ArrayList<>();
+        for(Long id : employeesId){
+            employees.add(employeeService.getEmployeeById(id));
+        }
+        System.out.println("employees.size() = " + employees.size());
+        return employees;
+    }
+    public List<Pet> findPetsById(List<Long> petsId){
+        List<Pet> pets = new ArrayList<>();
+        for(Long id : petsId){
+            pets.add(petService.getPetById(id));
+        }
+        System.out.println("pets.size() = " + pets.size());
+        return pets;
     }
 }
