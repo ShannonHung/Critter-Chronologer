@@ -1,6 +1,13 @@
 # Lesson 3 Final Project: Critter Chronologer 
 ###### tags: `Udacity`
-
+# 使用說明
+1. 下載code到本地
+2. 執行程式給他跑一下
+3. 如果想要看資料庫裡面的東西請輸入 localhost:8082/h2
+4. JDBC URL: 設定jdbc:h2:mem:critter
+   username: sa
+   password:(不輸入任何東西)
+   
 
 # 01 Project Instructions
 **Critter Chronologer**
