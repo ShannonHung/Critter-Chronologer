@@ -14,10 +14,6 @@ import static com.udacity.jdnd.course3.critter.user.EmployeeSkill.PETTING;
  */
 @SpringBootApplication
 public class CritterApplication {
-
-	@Autowired
-	EmployeeService employeeService;
-
 	public static void main(String[] args) {
 		SpringApplication.run(CritterApplication.class, args);
 	}

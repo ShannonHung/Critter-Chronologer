@@ -4,6 +4,7 @@ import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;

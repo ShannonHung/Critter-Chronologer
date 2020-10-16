@@ -22,7 +22,7 @@ public class PetController {
     @Autowired
     CustomerService customerService;
 
-    @PostMapping("/{petId}")
+    @PostMapping("/{OwnerId}")
     public PetDTO savePet(@RequestBody PetDTO petDTO) {
         //先設定好pet裡面應該要有的內容 然後透過findCustomerById找到customer存進去pet裡面
         //可是!!!這時候的customer還沒有將最新的pet存進去!!
